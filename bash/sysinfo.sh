@@ -6,66 +6,95 @@ if [[ $EUID -ne 0 ]]; then
     exit 1
 fi
 
-# Function to check command success and print error message if it fails
-check_command() {
-    if [ $? -ne 0 ]; then
-        echo "An error occurred while running the command: $1"
-        exit 1
-    fi
-}
-
 # System Description
 echo "System Description"
 echo "------------------"
 
-manufacturer=$(dmidecode -s system-manufacturer)
-check_command "dmidecode"
-description=$(dmidecode -s system-product-name)
-check_command "dmidecode"
-serial_number=$(dmidecode -s system-serial-number)
-check_command "dmidecode"
+manufacturer=$(dmidecode -s system-manufacturer 2>/dev/null)
+if [[ -z $manufacturer ]]; then
+    echo "Computer manufacturer: Data unavailable"
+else
+    echo "Computer manufacturer: $manufacturer"
+fi
 
-echo "Manufacturer: $manufacturer"
-echo "Description: $description"
-echo "Serial Number: $serial_number"
+description=$(dmidecode -s system-product-name 2>/dev/null)
+if [[ -z $description ]]; then
+    echo "Computer description or model: Data unavailable"
+else
+    echo "Computer description or model: $description"
+fi
+
+serial_number=$(dmidecode -s system-serial-number 2>/dev/null)
+if [[ -z $serial_number ]]; then
+    echo "Computer serial number: Data unavailable"
+else
+    echo "Computer serial number: $serial_number"
+fi
+
 echo
 
 # CPU Information
 echo "CPU Information"
 echo "---------------"
 
-cpu_manufacturer=$(lshw -class processor | awk '/product/ {print $2}')
-check_command "lshw"
-cpu_model=$(lshw -class processor | awk '/product/ {print $3}')
-check_command "lshw"
-cpu_architecture=$(lshw -class processor | awk '/width/ {print $2}')
-check_command "lshw"
-cpu_core_count=$(lshw -class processor | awk '/core/ {print $4}' | head -n 1)
-check_command "lshw"
-cpu_max_speed=$(lshw -class processor | awk '/capacity/ {print $2}' | head -n 1)
-check_command "lshw"
-cache_sizes=$(lshw -class processor | awk '/size/ {print $2}' | head -n 3)
-check_command "lshw"
+cpu_manufacturer=$(lshw -class processor | awk '/product/ {print $2}' 2>/dev/null)
+if [[ -z $cpu_manufacturer ]]; then
+    echo "CPU manufacturer: Data unavailable"
+else
+    echo "CPU manufacturer: $cpu_manufacturer"
+fi
 
-echo "Manufacturer: $cpu_manufacturer"
-echo "Model: $cpu_model"
-echo "Architecture: $cpu_architecture"
-echo "Core Count: $cpu_core_count"
-echo "Maximum Speed: $cpu_max_speed"
-echo "Cache Sizes:"
-echo "$cache_sizes"
+cpu_model=$(lshw -class processor | awk '/product/ {print $3}' 2>/dev/null)
+if [[ -z $cpu_model ]]; then
+    echo "CPU model: Data unavailable"
+else
+    echo "CPU model: $cpu_model"
+fi
+
+cpu_architecture=$(lshw -class processor | awk '/width/ {print $2}' 2>/dev/null)
+if [[ -z $cpu_architecture ]]; then
+    echo "CPU architecture: Data unavailable"
+else
+    echo "CPU architecture: $cpu_architecture"
+fi
+
+cpu_core_count=$(lshw -class processor | awk '/core/ {print $4}' | head -n 1 2>/dev/null)
+if [[ -z $cpu_core_count ]]; then
+    echo "CPU core count: Data unavailable"
+else
+    echo "CPU core count: $cpu_core_count"
+fi
+
+cpu_max_speed=$(lshw -class processor | awk '/capacity/ {print $2}' | head -n 1 2>/dev/null)
+if [[ -z $cpu_max_speed ]]; then
+    echo "CPU maximum speed: Data unavailable"
+else
+    echo "CPU maximum speed: $cpu_max_speed"
+fi
+
+cache_sizes=$(lshw -class processor | awk '/size/ {print $2}' | head -n 3 2>/dev/null)
+if [[ -z $cache_sizes ]]; then
+    echo "Cache sizes (L1, L2, L3): Data unavailable"
+else
+    echo "Cache sizes (L1, L2, L3):"
+    echo "$cache_sizes"
+fi
+
 echo
 
 # Operating System Information
 echo "Operating System Information"
 echo "---------------------------"
 
-linux_distro=$(lsb_release -ds)
-check_command "lsb_release"
-distro_version=$(lsb_release -rs)
-check_command "lsb_release"
+linux_distro=$(lsb_release -ds 2>/dev/null)
+if [[ -z $linux_distro ]]; then
+    echo "Linux distro: Data unavailable"
+else
+    echo "Linux distro: $linux_distro"
+fi
 
-echo "Linux Distro: $linux_distro"
-echo "Distro Version: $distro_version"
-
-
+distro_version=$(lsb_release -rs 2>/dev/null)
+if [[ -z $distro_version ]]; then
+    echo "Distro version: Data unavailable"
+else
+    echo "Distro version: $dist
