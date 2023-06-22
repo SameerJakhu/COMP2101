@@ -1,5 +1,4 @@
 #!/bin/bash
-# I have found out by error fixing that the script is executable by the command sudo bash systeminfo.sh
 # Import the function library
 source reportfunctions.sh
 
